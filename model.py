@@ -371,8 +371,8 @@ class ModelMLDG(ModelBaseline):
 
             print(
                 'ite:', ite,
-                'meta_train_loss:', meta_train_loss.cpu().data.numpy()[0],
-                'meta_val_loss:', meta_val_loss.cpu().data.numpy()[0],
+                'meta_train_loss:', meta_train_loss.cpu().data.numpy(),
+                'meta_val_loss:', meta_val_loss.cpu().data.numpy(),
                 'lr:',
                 self.scheduler.get_lr()[0])
 
