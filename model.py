@@ -378,7 +378,7 @@ class ModelMLDG(ModelBaseline):
 
             flags_log = os.path.join(flags.logs, 'loss_log.txt')
             write_log(
-                str(meta_train_loss.cpu().data.numpy()[0]) + '\t' + str(meta_val_loss.cpu().data.numpy()[0]),
+                str(meta_train_loss.cpu().data.numpy()) + '\t' + str(meta_val_loss.cpu().data.numpy()),
                 flags_log)
 
             del total_loss, outputs_val, outputs_train
