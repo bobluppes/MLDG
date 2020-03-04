@@ -204,12 +204,12 @@ class ModelBaseline:
             self.optimizer.step()
 
             print(
-                'ite:', ite, 'loss:', total_loss.cpu().data.numpy()[0], 'lr:',
+                'ite:', ite, 'loss:', total_loss.cpu().data.numpy(), 'lr:',
                 self.scheduler.get_lr()[0])
 
             flags_log = os.path.join(flags.logs, 'loss_log.txt')
             write_log(
-                str(total_loss.cpu().data.numpy()[0]),
+                str(total_loss.cpu().data.numpy()),
                 flags_log)
 
             del total_loss, outputs
