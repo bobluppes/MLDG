@@ -203,9 +203,8 @@ class ModelBaseline:
             # optimize the parameters
             self.optimizer.step()
 
-            print(
-                'ite:', ite, 'loss:', total_loss.cpu().data.numpy(), 'lr:',
-                self.scheduler.get_lr()[0])
+            if ite % 10000 == 0 || ite == flags.inner_loops:
+                print('ite:', ite, 'loss:', total_loss.cpu().data.numpy(), 'lr:', self.scheduler.get_lr()[0])
 
             flags_log = os.path.join(flags.logs, 'loss_log.txt')
             write_log(
