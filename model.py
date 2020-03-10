@@ -284,7 +284,7 @@ class ModelBaseline:
             predictions = predictions.cpu().data.numpy()
 
         accuracy = compute_accuracy(predictions=predictions, labels=labels_test)
-        print('----------accuracy test----------:', accuracy)
+        # print('----------accuracy test----------:', accuracy)
 
         if not os.path.exists(log_dir):
             os.mkdir(log_dir)
