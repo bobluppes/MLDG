@@ -69,7 +69,8 @@ class ModelBaseline:
 
         unseen_index = flags.unseen_index
 
-        self.unseen_data_path = os.path.join(root_folder, test_data[unseen_index])
+        self.unseen_data_path = os.path.join(
+            root_folder, test_data[unseen_index])
         self.train_paths.remove(self.train_paths[unseen_index])
         self.val_paths.remove(self.val_paths[unseen_index])
 
@@ -123,11 +124,13 @@ class ModelBaseline:
         test_images = batImageGenTest.images
 
         threshold = 100
-        n_slices_test = len(test_images) / threshold
+        n_slices_test = len(test_images) // threshold
         indices_test = []
         for per_slice in range(n_slices_test - 1):
-            indices_test.append(len(test_images) * (per_slice + 1) / n_slices_test)
-        test_image_splits = np.split(test_images, indices_or_sections=indices_test)
+            indices_test.append(len(test_images) *
+                                (per_slice + 1) // n_slices_test)
+        test_image_splits = np.split(
+            test_images, indices_or_sections=indices_test)
 
         # Verify the splits are correct
         test_image_splits_2_whole = np.concatenate(test_image_splits)
@@ -137,7 +140,8 @@ class ModelBaseline:
         predictions = []
         self.network.eval()
         for test_image_split in test_image_splits:
-            images_test = Variable(torch.from_numpy(np.array(test_image_split, dtype=np.float32))).cuda()
+            images_test = Variable(torch.from_numpy(
+                np.array(test_image_split, dtype=np.float32))).cuda()
             outputs, end_points = self.network(images_test)
 
             pred = end_points['Predictions']
@@ -164,7 +168,8 @@ class ModelBaseline:
                              weight_decay=flags.weight_decay,
                              momentum=flags.momentum)
 
-        self.scheduler = lr_scheduler.StepLR(optimizer=self.optimizer, step_size=flags.step_size, gamma=0.1)
+        self.scheduler = lr_scheduler.StepLR(
+            optimizer=self.optimizer, step_size=flags.step_size, gamma=0.1)
         self.loss_fn = crossentropyloss()
 
     def train(self, flags):
@@ -178,7 +183,8 @@ class ModelBaseline:
 
             total_loss = 0.0
             for index in range(len(self.batImageGenTrains)):
-                images_train, labels_train = self.batImageGenTrains[index].get_images_labels_batch()
+                images_train, labels_train = self.batImageGenTrains[index].get_images_labels_batch(
+                )
 
                 inputs, labels = torch.from_numpy(
                     np.array(images_train, dtype=np.float32)), torch.from_numpy(
@@ -186,7 +192,7 @@ class ModelBaseline:
 
                 # wrap the inputs and labels in Variable
                 inputs, labels = Variable(inputs, requires_grad=False).cuda(), \
-                                 Variable(labels, requires_grad=False).long().cuda()
+                    Variable(labels, requires_grad=False).long().cuda()
 
                 outputs, _ = self.network(x=inputs)
 
@@ -204,7 +210,8 @@ class ModelBaseline:
             self.optimizer.step()
 
             if ite % 10000 == 0 or ite == flags.inner_loops:
-                print('ite:', ite, 'loss:', total_loss.cpu().data.numpy(), 'lr:', self.scheduler.get_lr()[0])
+                print('ite:', ite, 'loss:', total_loss.cpu().data.numpy(),
+                      'lr:', self.scheduler.get_lr()[0])
 
             flags_log = os.path.join(flags.logs, 'loss_log.txt')
             write_log(
@@ -231,14 +238,16 @@ class ModelBaseline:
             self.best_accuracy_val = mean_acc
 
             f = open(os.path.join(flags.logs, 'Best_val.txt'), mode='a')
-            f.write('ite:{}, best val accuracy:{}\n'.format(ite, self.best_accuracy_val))
+            f.write('ite:{}, best val accuracy:{}\n'.format(
+                ite, self.best_accuracy_val))
             f.close()
 
             if not os.path.exists(flags.model_path):
                 os.mkdir(flags.model_path)
 
             outfile = os.path.join(flags.model_path, 'best_model.tar')
-            torch.save({'ite': ite, 'state': self.network.state_dict()}, outfile)
+            torch.save(
+                {'ite': ite, 'state': self.network.state_dict()}, outfile)
 
     def test(self, flags, ite, log_prefix, log_dir='logs/', batImageGenTest=None):
 
@@ -246,7 +255,8 @@ class ModelBaseline:
         self.network.eval()
 
         if batImageGenTest is None:
-            batImageGenTest = BatchImageGenerator(flags=flags, file_path='', stage='test', b_unfold_label=True)
+            batImageGenTest = BatchImageGenerator(
+                flags=flags, file_path='', stage='test', b_unfold_label=True)
 
         images_test = batImageGenTest.images
         labels_test = batImageGenTest.labels
@@ -254,11 +264,13 @@ class ModelBaseline:
         threshold = 50
         if len(images_test) > threshold:
 
-            n_slices_test = len(images_test) / threshold
+            n_slices_test = len(images_test) // threshold
             indices_test = []
             for per_slice in range(n_slices_test - 1):
-                indices_test.append(len(images_test) * (per_slice + 1) / n_slices_test)
-            test_image_splits = np.split(images_test, indices_or_sections=indices_test)
+                indices_test.append(len(images_test) *
+                                    (per_slice + 1) // n_slices_test)
+            test_image_splits = np.split(
+                images_test, indices_or_sections=indices_test)
 
             # Verify the splits are correct
             test_image_splits_2_whole = np.concatenate(test_image_splits)
@@ -267,7 +279,8 @@ class ModelBaseline:
             # split the test data into splits and test them one by one
             test_image_preds = []
             for test_image_split in test_image_splits:
-                images_test = Variable(torch.from_numpy(np.array(test_image_split, dtype=np.float32))).cuda()
+                images_test = Variable(torch.from_numpy(
+                    np.array(test_image_split, dtype=np.float32))).cuda()
                 outputs, end_points = self.network(images_test)
 
                 predictions = end_points['Predictions']
@@ -277,20 +290,23 @@ class ModelBaseline:
             # concatenate the test predictions first
             predictions = np.concatenate(test_image_preds)
         else:
-            images_test = Variable(torch.from_numpy(np.array(images_test, dtype=np.float32))).cuda()
+            images_test = Variable(torch.from_numpy(
+                np.array(images_test, dtype=np.float32))).cuda()
             outputs, end_points = self.network(images_test)
 
             predictions = end_points['Predictions']
             predictions = predictions.cpu().data.numpy()
 
-        accuracy = compute_accuracy(predictions=predictions, labels=labels_test)
+        accuracy = compute_accuracy(
+            predictions=predictions, labels=labels_test)
         # print('----------accuracy test----------:', accuracy)
 
         if not os.path.exists(log_dir):
             os.mkdir(log_dir)
 
         log_path = os.path.join(log_dir, '{}.txt'.format(log_prefix))
-        write_log(str('ite:{}, accuracy:{}'.format(ite, accuracy)), log_path=log_path)
+        write_log(str('ite:{}, accuracy:{}'.format(
+            ite, accuracy)), log_path=log_path)
 
         # switch on the network train mode after test
         self.network.train()
@@ -313,7 +329,8 @@ class ModelMLDG(ModelBaseline):
             self.scheduler.step(epoch=ite)
 
             # select the validation domain for meta val
-            index_val = np.random.choice(a=np.arange(0, len(self.batImageGenTrains)), size=1)[0]
+            index_val = np.random.choice(a=np.arange(
+                0, len(self.batImageGenTrains)), size=1)[0]
             batImageMetaVal = self.batImageGenTrains[index_val]
 
             meta_train_loss = 0.0
@@ -323,7 +340,8 @@ class ModelMLDG(ModelBaseline):
                 if index == index_val:
                     continue
 
-                images_train, labels_train = self.batImageGenTrains[index].get_images_labels_batch()
+                images_train, labels_train = self.batImageGenTrains[index].get_images_labels_batch(
+                )
 
                 inputs_train, labels_train = torch.from_numpy(
                     np.array(images_train, dtype=np.float32)), torch.from_numpy(
@@ -331,7 +349,7 @@ class ModelMLDG(ModelBaseline):
 
                 # wrap the inputs and labels in Variable
                 inputs_train, labels_train = Variable(inputs_train, requires_grad=False).cuda(), \
-                                             Variable(labels_train, requires_grad=False).long().cuda()
+                    Variable(labels_train, requires_grad=False).long().cuda()
 
                 # forward with the adapted parameters
                 outputs_train, _ = self.network(x=inputs_train)
@@ -347,7 +365,7 @@ class ModelMLDG(ModelBaseline):
 
             # wrap the inputs and labels in Variable
             inputs_val, labels_val = Variable(inputs_val, requires_grad=False).cuda(), \
-                                     Variable(labels_val, requires_grad=False).long().cuda()
+                Variable(labels_val, requires_grad=False).long().cuda()
 
             # forward with the adapted parameters
             outputs_val, _ = self.network(x=inputs_val,
@@ -377,7 +395,8 @@ class ModelMLDG(ModelBaseline):
 
             flags_log = os.path.join(flags.logs, 'loss_log.txt')
             write_log(
-                str(meta_train_loss.cpu().data.numpy()) + '\t' + str(meta_val_loss.cpu().data.numpy()),
+                str(meta_train_loss.cpu().data.numpy()) +
+                '\t' + str(meta_val_loss.cpu().data.numpy()),
                 flags_log)
 
             del total_loss, outputs_val, outputs_train
