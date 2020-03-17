@@ -386,12 +386,8 @@ class ModelMLDG(ModelBaseline):
             # optimize the parameters
             self.optimizer.step()
 
-            print(
-                'ite:', ite,
-                'meta_train_loss:', meta_train_loss.cpu().data.numpy(),
-                'meta_val_loss:', meta_val_loss.cpu().data.numpy(),
-                'lr:',
-                self.scheduler.get_lr()[0])
+            if ite % 10000 == 0 or ite == flags.inner_loops:
+                print('ite:', ite, 'meta_train_loss:', meta_train_loss.cpu().data.numpy(), 'meta_val_loss:', meta_val_loss.cpu().data.numpy(), 'lr:', self.scheduler.get_lr()[0])
 
             flags_log = os.path.join(flags.logs, 'loss_log.txt')
             write_log(
