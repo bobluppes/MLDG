@@ -1,29 +1,32 @@
-# algo Goal / intro..............
+# Blogpost DL "Learning to Generalize: Meta-Learning for Domain Generalization"
 
-- what is meta learning / learning to learn
-- why do we want to L2L /generalise across multiple domains
-- why do want do do it quickly
+bob
+
+mats
+
+wouter
+
+# Introduction
 
 ---
+
+This blog post is part of the TU Delft Deep Learning Course. This blogpost will detail our process of reproducing the experiments and results from the paper "Learning to Generalize: Meta-Learning for Domain Generalization", [https://arxiv.org/abs/1710.03463](https://arxiv.org/abs/1710.03463) while observing and improving upon their available code.
 
 Humans are adept at solving tasks under many different conditions. This is partly due to to fast adaptation, but also due to a lifetime of encountering new task conditions providing the opportunity to develop strategies which are robust to different task contexts. 
 
 We would like artificial learning agents to do the same because this would make them much more versatile and perform better 'out-the-box'.
 
-# Algorithm
+This paper proposes a novel meta learning approach for domain generalisation rather than proposing a specific model suited for DG. 
 
-- meta steps for train and learn
-- virtual train and test domains
-- plaatje uit paper
-- leuk
+# Algorithm
 
 The meta learning algorithm used in the paper is designed to make the model more robust for domain shifts. Therefore Domain Generalization methods are used. Hence, the algorithm is called Meta-Learning Domain Generalization. The high-level pseudocode of the algorithm can be found in figure ......
 
-![Blogpost%20skeleton/pseudocode.png](Blogpost%20skeleton/pseudocode.png)
+![Blogpost%20DL%20Learning%20to%20Generalize%20Meta%20Learning%20f/pseudocode.png](Blogpost%20DL%20Learning%20to%20Generalize%20Meta%20Learning%20f/pseudocode.png)
 
 As can be seen in line 2, the algorithm starts off by defining the domains S (i.e. Photo, Art painting, Cartoon, Sketch). Hereafter, the initial model parameters (Theta) and hyperparameters (Alpha, Beta, Gamma) are set. Line 4 denotes the start of the iterations. In each iteration, the training domain data are split in a meta-train set and a meta-test set as can be seen in figure ..... It should be clear that the meta-test set is composed out of training data and not test data. 
 
-![Blogpost%20skeleton/fig1.png](Blogpost%20skeleton/fig1.png)
+![Blogpost%20DL%20Learning%20to%20Generalize%20Meta%20Learning%20f/fig1.png](Blogpost%20DL%20Learning%20to%20Generalize%20Meta%20Learning%20f/fig1.png)
 
 (Dit plaatje maar dan iets duidelijker)
 
@@ -39,7 +42,6 @@ For this experiment, the PACS multi-domain recognition benchmark was used. This 
 
 - Dog
 - Elephant
-
 - Giraffe
 - Guitar
 - House
@@ -53,7 +55,7 @@ For this experiment, the PACS multi-domain recognition benchmark was used. This 
 - Cartoon
 - Sketch
 
-    ![Blogpost%20skeleton/project_img1.png](Blogpost%20skeleton/project_img1.png)
+    ![Blogpost%20DL%20Learning%20to%20Generalize%20Meta%20Learning%20f/project_img1.png](Blogpost%20DL%20Learning%20to%20Generalize%20Meta%20Learning%20f/project_img1.png)
 
 The proposed MLDG algorithm is compared against 4 baseline models. These are shown below.
 
@@ -68,18 +70,21 @@ The results which are to be reproduced are shown in table 1. In this table, the 
 
 [Table 1]
 
-![Blogpost%20skeleton/table_1.png](Blogpost%20skeleton/table_1.png)
+![Blogpost%20DL%20Learning%20to%20Generalize%20Meta%20Learning%20f/table_1.png](Blogpost%20DL%20Learning%20to%20Generalize%20Meta%20Learning%20f/table_1.png)
 
-# repro efforts
+# Reproduction efforts
 
-- [ ]  How did we tackle this challenge
-    - [ ]  python 3
-    - [ ]  pytorch rewrite
-    - [ ]  remove numpy
-    - [ ]  cuda handlers
-- [ ]  strategy
-- [ ]  methods used
-- [ ]  expectations
+First we dived into the existing code and rewrote it to python 3.
+
+The first challenge we encountered was that google Colab stopped running too early to complete an entire run. Within each run crossvalidation is applied and thus several iterations are ran. To solve this issue we unwound the run loop so we could run each iteration separately. 
+
+This allowed us to plot the meta-train and meta-test loss for each iteration within the run as can be seen in the results.
+
+# **Future Work**
+
+---
+
+The code uses numpy whereas pyTorch might be a better candidate because it is capable of harnessing the power of the GPU
 
 # repro results
 
@@ -92,11 +97,11 @@ The results which are to be reproduced are shown in table 1. In this table, the 
 
     MLP: average test accuracy 69.5%
 
-    ![Blogpost%20skeleton/mlp.png](Blogpost%20skeleton/mlp.png)
+    ![Blogpost%20DL%20Learning%20to%20Generalize%20Meta%20Learning%20f/mlp.png](Blogpost%20DL%20Learning%20to%20Generalize%20Meta%20Learning%20f/mlp.png)
 
     MLDG: average test accuracy 71.7%
 
-    ![Blogpost%20skeleton/mldg.png](Blogpost%20skeleton/mldg.png)
+    ![Blogpost%20DL%20Learning%20to%20Generalize%20Meta%20Learning%20f/mldg.png](Blogpost%20DL%20Learning%20to%20Generalize%20Meta%20Learning%20f/mldg.png)
 
 # repro discussion
 
@@ -104,23 +109,5 @@ The results which are to be reproduced are shown in table 1. In this table, the 
 - [ ]  absolute results
 - [ ]  Baseline is different from the baselines in table 1
 
-# Efforts
-
----
-
-1. omschrijven naar python 3
-2. google colab stopte te vroeg (limited runtime)
-3. Loop unrolling = loops opbreken voor zodat elke run los kan
-4. plotten van meta-train loss en meta-validation loss → plots voor blog
-5. 
-6. 
-
-- [ ]  pyTorch voor future work
 - [ ]  paper checken voor hoeveel runs nodig zijn
     - [ ]  accuracy
-
-1 run = 4 iteraties, elk domein is unseen geweest
-
-k-fold crossvalidation
-
-discussie
