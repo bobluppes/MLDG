@@ -1,10 +1,10 @@
 # Blogpost DL "Learning to Generalize: Meta-Learning for Domain Generalization"
 
-bob
+bob [[Github](https://github.com/Bobr4y)]
 
 mats
 
-wouter
+wouter [[Github](https://github.com/h0uter)]
 
 # Introduction
 
@@ -20,6 +20,8 @@ This paper proposes a novel meta learning approach for domain generalisation rat
 
 # Algorithm
 
+---
+
 The meta learning algorithm used in the paper is designed to make the model more robust for domain shifts. Therefore Domain Generalization methods are used. Hence, the algorithm is called Meta-Learning Domain Generalization. The high-level pseudocode of the algorithm can be found in figure ......
 
 ![Blogpost%20DL%20Learning%20to%20Generalize%20Meta%20Learning%20f/pseudocode.png](Blogpost%20DL%20Learning%20to%20Generalize%20Meta%20Learning%20f/pseudocode.png)
@@ -32,7 +34,9 @@ As can be seen in line 2, the algorithm starts off by defining the domains S (i.
 
 Subsequently, the gradients for meta-train are calculated using the loss function (F). With this gradient, the proposed updated parameters can be calculated for the meta train set. Thus far, nothing new occurs except for splitting the domains in sets, when compared to normal backpropagation. However, in line 8 the loss function (G) is calculated for the meta-test set as well. In line 9, the updated parameters (Theta) are calculated based on the meta-train set loss function (F) and the meta-test set loss function (G) times a constant gamma. One can intuitively interpret this as the usual parameter calculation based on the train set gradients and loss function (F). However, these parameters are corrected by the loss function of the meta-test set (G). Therefore, the model will not overfit on a set of domains. 
 
-# Experiment 2 repro
+# Experiment to reproduce
+
+---
 
 From the paper, experiment 2 regarding object recognition had to be reproduced. The goal of this experiment is to recognize objection in one domain, while only train in another domain.
 
@@ -47,15 +51,15 @@ For this experiment, the PACS multi-domain recognition benchmark was used. This 
 - House
 - Horse
 - Person
+- Sketch
+
+    ![Blogpost%20DL%20Learning%20to%20Generalize%20Meta%20Learning%20f/project_img1.png](Blogpost%20DL%20Learning%20to%20Generalize%20Meta%20Learning%20f/project_img1.png)
 
 ### Domains
 
 - Photo
 - Art painting
 - Cartoon
-- Sketch
-
-    ![Blogpost%20DL%20Learning%20to%20Generalize%20Meta%20Learning%20f/project_img1.png](Blogpost%20DL%20Learning%20to%20Generalize%20Meta%20Learning%20f/project_img1.png)
 
 The proposed MLDG algorithm is compared against 4 baseline models. These are shown below.
 
@@ -68,11 +72,13 @@ The proposed MLDG algorithm is compared against 4 baseline models. These are sho
 
 The results which are to be reproduced are shown in table 1. In this table, the accuracy of the considered baselines on the four different domains are shown as well as the results for the proposed MLDG algorithm. The goal of this reproducability project is to reproduce the accuracy of the proposed MLDG algorithm on the different domains (right column of table 1).
 
-[Table 1]
-
 ![Blogpost%20DL%20Learning%20to%20Generalize%20Meta%20Learning%20f/table_1.png](Blogpost%20DL%20Learning%20to%20Generalize%20Meta%20Learning%20f/table_1.png)
 
-# Reproduction efforts
+# Reproduction
+
+---
+
+## Efforts
 
 First we dived into the existing code and rewrote it to python 3.
 
@@ -80,13 +86,11 @@ The first challenge we encountered was that google Colab stopped running too ear
 
 This allowed us to plot the meta-train and meta-test loss for each iteration within the run as can be seen in the results.
 
-# **Future Work**
+## Understanding the code
 
----
+## Results
 
-The code uses numpy whereas pyTorch might be a better candidate because it is capable of harnessing the power of the GPU
-
-# repro results
+[Untitled](https://www.notion.so/929ed28f2b6b46db95c05c4c6987e647)
 
 - [ ]  what accuracy did we achieve
 - [ ]  how long did it train for
@@ -103,7 +107,7 @@ The code uses numpy whereas pyTorch might be a better candidate because it is ca
 
     ![Blogpost%20DL%20Learning%20to%20Generalize%20Meta%20Learning%20f/mldg.png](Blogpost%20DL%20Learning%20to%20Generalize%20Meta%20Learning%20f/mldg.png)
 
-# repro discussion
+# Discussion
 
 - [ ]  compare to orig results
 - [ ]  absolute results
@@ -111,3 +115,11 @@ The code uses numpy whereas pyTorch might be a better candidate because it is ca
 
 - [ ]  paper checken voor hoeveel runs nodig zijn
     - [ ]  accuracy
+
+### **Future Work**
+
+The code uses numpy whereas pyTorch might be a better candidate because it is capable of harnessing the power of the GPU
+
+## References
+
+-
