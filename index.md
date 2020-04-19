@@ -207,12 +207,12 @@ Because the code is available for a given paper does not necessarily mean that i
 
   From these hyperaparameters, only `Test_every` was defined in the original code of the authors, but not in the paper. This parameter sets the number of training iterations before the network is tested on the validation set in order to log the intermediate accuracy. This parameter has no influence over the training of the network and therefore has no influence on the accuracy on the held out test.
   
-Apart from the above mentioned e
+Apart from the above mentioned efforts, a significant effort went into fully understanding the code and corectly interpreting the obtained results.
 
 
 ## Results
 
-Using the code as described above (see [here](https://github.com/h0uter/MLDG) for the full repository), an attempt was made to reproduce the results from table 1.  A baseline (MLP) and the MLDG model are trained on the extracted features of the PACS dataset. The accuracy of both models for the four different domains can be seen below in table 2.
+Using the code as described above (see [here](https://github.com/h0uter/MLDG/tree/python3) for the full repository), an attempt was made to reproduce the results from table 1.  A baseline (MLP) and the MLDG model are trained on the extracted features of the PACS dataset. The accuracy of both models for the four different domains can be seen below in table 2.
 
 
 | Domain | MLP | MLDG |
@@ -222,6 +222,7 @@ Using the code as described above (see [here](https://github.com/h0uter/MLDG) fo
 | photo     | 89.61     | 95.74     |
 | sketch     | 33.72     | 38.94     |
 | Ave.     | 61.15     | 63.68     |
+
 *Table 2*
 
 
@@ -236,6 +237,7 @@ The comparison of the reproduced MLDG results against the original MLDG results 
 | photo     | 88.00     | 95.74     | +8.79 % |
 | sketch     | 57.51     | 38.94     | -32.3 % |
 | Ave.     | 70.01     | 63.68     | -9.04 % |
+
 *Table 3*
 
 It can be argued that these reproduced accuracies improve when more independent runs are performed. In order to investigate this, a 95% confidence interval is calculated for the average accuracy of the reproduced MLDG model. This confidence interval is given by
@@ -269,15 +271,20 @@ Because the rankings of the domains in terms of difficulty stays more or less th
 To conclude, the original results obtained in the paper were not reproduced.
 
 # Discussion
+There could be multiple reasons why the original results from table 1 were not fully reproducible. 
 
+A possible explaination could be that the authors slightly altered/optimized their algorithm while rewriting it to Tensorflow. The available code base is a previous version of the code, which after inspection and testing should behave exactly like the pseudocode algorithm in figure 1. It could be possible that the overall algorithm was altered or optimized in some way when it was rewritten into Tensorflow.
 
+A second possibility could be that the number of runs performed is critical to the accuracy of the original paper. In our reproducability project, only 3 runs were performed because it was found that the accuracy did not vary significantly between runs (see the 95% confidence interval). It could be that the authors ran the experiment a large number of times and averaged the resulting accuracies, but this was not specified in the paper.
 
-
+Whether or not this is the case could be investigated in future work.
 
 
 ### **Future Work**
 
-The code uses numpy whereas pyTorch might be a better candidate because it is capable of harnessing the power of the GPU, especially NVIDIA GPU's combined with CUDA parallel processing. 
+In order to give a better insight into the independent reproducability of the paper, it could be an option to completely rewrite the codebase based on the pseudocode algorithm from figure 1 and the hyperparameters specified in the paper.
+
+If this produces similar results to the reproduced results in table 2 it could be concluded that this paper is not independently reproducible.
 
 ## References
 
