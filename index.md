@@ -1,10 +1,10 @@
 # Blogpost DL meta learning
 
-bob [[Github](https://github.com/Bobr4y)]
+Bob [[Github](https://github.com/Bobr4y)]
 
-wouter [[Github](https://github.com/h0uter)]
+Wouter [[Github](https://github.com/h0uter)]
 
-mats [[Github](https://github.com/1997rijkeboer)]
+Mats [[Github](https://github.com/1997rijkeboer)]
 
 # Introduction
 ---
@@ -250,11 +250,13 @@ Apart from reproducing the results in table 1, the meta train loss and metal val
 
 ![](https://i.imgur.com/Xa9S5Wx.png)
 
-photo domain
+*photo domain*
+
+
 
 ![](https://i.imgur.com/Wlvdgdr.png)
 
-sketch domain
+*sketch domain*
 
 
 # Conclusion
@@ -281,7 +283,6 @@ Whether or not this is the case could be investigated in future work.
 
 
 ### **Future Work**
-
 In order to give a better insight into the independent reproducability of the paper, it could be an option to completely rewrite the codebase based on the pseudocode algorithm from figure 1 and the hyperparameters specified in the paper.
 
 If this produces similar results to the reproduced results in table 2 it could be concluded that this paper is not independently reproducible.
