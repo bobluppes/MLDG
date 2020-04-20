@@ -79,10 +79,9 @@ The results which are to be reproduced, are shown in table 1. In this table, the
 
 
 # Reproduction
-
+---
 The authors of the paper have published the code used for the first draft of their paper. This publicaly available repository will be used as a starting point for the reproducability project.
 
----
 
 ## Understanding the code
 
@@ -116,19 +115,23 @@ for MLDG only:
 - the step size of the meta-learn step: meta_step_size
 - the value for the hyper parameter beta: meta_val_beta
 
-The models are defined in main_XXX.py by initialising their respective classes with a rather long list of parameters. These parameters include:
+The models are defined in main_XXX.py by initialising their respective classes with a long list of (hyper) parameters. These parameters include:
 
-- 
--
--
+- number of test every steps: `test_every`
+- batch size for training `batch_size` (default is 64)
+- number of classes: `num_classes`
+- momentum: `momentum`
+- number of classes" `inner_loops`
+- number of step size to decay the lr: `step_size`
+- index of unseen domain: `unseen_index`
+- learning rate of the model: `lr`
+- weight decay: `weight_decay`
+
 
 Both classes are defined in `model.py`.
-MLDG inherits it's initialization from the baseline.
+The MLDG model defines a new train method and inherits all other methods and properties from the baseline model.
 
->> explain which parts of the algorithm correspond to which lines of code
->> 
-explain 2 parts of the code where loss and meta loss is defined
-
+We will now discuss the interesting parts of the MLDG train method.
 ```
 images_train, labels_train = self.batImageGenTrains[index].get_images_labels_batch(
                 )
@@ -148,7 +151,11 @@ images_train, labels_train = self.batImageGenTrains[index].get_images_labels_bat
                 loss = self.loss_fn(outputs_train, labels_train)
                 meta_train_loss += loss
 ```
-> take train imag and train labels, turn into cuda compatible var, run through network -> output calculate loss on training set
+
+The numpy data structures are converted to Torch compatible data structures and subsequently converted to Cuda variables. Then a regular forward pass is executed and the loss is calculated. 
+>The sum of these losses on all meta training domains is the _Meta-Loss_
+
+
 
 ```
 image_val, labels_val = batImageMetaVal.get_images_labels_batch()
@@ -168,15 +175,16 @@ image_val, labels_val = batImageMetaVal.get_images_labels_batch()
 
             meta_val_loss = self.loss_fn(outputs_val, labels_val)
 ```
-> same as above but now with adapted parameters. self.network??? network is a Multi Layer Perceptron
-> loss on validation set
-> propose new parameters and check if they also lead to good generalised performance across other domains.
-> meta-step size
-```
-total_loss = meta_train_loss + meta_val_loss * flags.meta_val_beta
+Now we essentially do the same as above but this time the proposed adapted parameters are tested on the meta-test domains. This is the key strategy of this method. The proposed parameters are only desirable if they lead to both increased performance on the meta-train domain as wel as on the meta-test domain. AKA we are looking for adaptations which lead to increased performance across a whole range of very different domains (for example PACS, as shown before). 
+
+Here the hyper parameter of meta-stepsize has also come into play.
+The meta-stepsize governs the step size during the meta-training whereas the regular step size governs actual train step.
+
 
 ```
-Vervolgens backprop op de total loss met SGD
+total_loss = meta_train_loss + meta_val_loss * flags.meta_val_beta
+```
+Now for training the `total_loss` is used. The total loss is composed of the meta-train loss and the meta-test loss. The `meta_val_beta` hyper parameter is used to tune the relative importance of both. Finally this loss is used in a regular backpropagation step with Stochastic Gradient Descent.
 
 ## Efforts
 
@@ -189,9 +197,9 @@ As of January 2020, Python 2 will receive the EOL (End Of Life) status and will 
 * **Get code running on Google Colab**<br>
 Google Colab was used to deploy and run the repository. The entrypoint to the original codebase are the files `run_baseline.sh` and `run_mldg.sh`. To avoid extra work in order to run shell scrips in Colab, these entrypoints were rewritten to Python 3 files named `run_baseline.py` and `run_mldg.py` respectively.
 * **Loop unroling**<br>
-The first challenge we encountered was that google Colab stopped running too early to complete multiple runs back-to-back. Each run consist of 4 iterations in which a single domain is held out from the training set. To solve this problem, the outer loop of the entry scripts is unroled, enabling the runs to be executed independently. 
+The first challenge we encountered was that google Colab stopped running too early to complete multiple runs back-to-back. Each run consist of 4 iterations in which a single domain is held out from the training set. To solve this problem, the outer loop of the entry scripts is unrolled, enabling the runs to be executed independently. 
 * **Hyperparameter investigation**<br>
-Because the code is available for a given paper does not necessarily mean that it is independently reprodicuble. To get a better feel for the independent reproducability, it is investigated whether all hyperparameters used for this experiment are specified in the paper. This can be seen in the table below.
+Because the code is available for a given paper does not necessarily mean that it is independently reproducible. To get a better feel for the independent reproducability, it is investigated whether all hyperparameters used for this experiment are specified in the paper. This can be seen in the table below.
 
 
   | Hyperparameter | Value | Specified in paper |
@@ -205,9 +213,9 @@ Because the code is available for a given paper does not necessarily mean that i
   | Iterations     | 15 000     | Yes     |
   | Test_every     | 500     | No     |
 
-  From these hyperaparameters, only `Test_every` was defined in the original code of the authors, but not in the paper. This parameter sets the number of training iterations before the network is tested on the validation set in order to log the intermediate accuracy. This parameter has no influence over the training of the network and therefore has no influence on the accuracy on the held out test.
+  From these hyperparameters, only `Test_every` was defined in the original code of the authors, but not in the paper. This parameter sets the number of training iterations before the network is tested on the validation set in order to log the intermediate accuracy. This parameter has no influence over the training of the network and therefore has no influence on the accuracy on the held out test.
   
-Apart from the above mentioned efforts, a significant effort went into fully understanding the code and corectly interpreting the obtained results.
+Apart from the above mentioned efforts, a significant effort went into fully understanding the code and correctly interpreting the obtained results.
 
 
 ## Results
@@ -246,17 +254,20 @@ It can be argued that these reproduced accuracies improve when more independent 
 
 ### Investigating meta losses
 
-Apart from reproducing the results in table 1, the meta train loss and metal validation loss were investigated as a function of iteration in order to get a better understanding of the MLDG algorithm.
+Apart from reproducing the results in table 1, the meta train loss and metal validation loss were investigated as a function of iteration in order to get a better understanding of the MLDG algorithm. 
 
 ![](https://i.imgur.com/Xa9S5Wx.png)
 
-*photo domain*
+Figure: Photo Domain
 
+It seems as if the plot above might have benefitted from a more decaying step size to prevent large fluctuations. Similarly we could speculate that the validation set used there is unrepresentative. This makes sense, as it is not composed of all domains. In this case it indicates that the validation dataset may be easier for the model to predict than the training dataset. This can be seen from the lower average losses for the validation set compared to the training set. The domain in the validation set is therefore better predictable than the ones in the training set. This is of course logical due to the model not performing completely equal for all domains, which can be seen in previous tables. Also, the model doesn't seem to be overfitted and no early-stop has to be performed. The difference between the two lines denotes the generalization error.
 
 
 ![](https://i.imgur.com/Wlvdgdr.png)
 
-*sketch domain*
+Figure: Sketch Domain
+
+From the above figure can be seen that after iteration 120 little improvement is made. To compare, in Figure: Photo Domain it seems as if after iteration 250 the model doesn't learn a lot. Also, the generalization is very small in the sketch domain plot. However as could be seen from table 3, the accuracy of this model is rather low. 
 
 
 # Conclusion
