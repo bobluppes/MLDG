@@ -80,7 +80,7 @@ The results, which are to be reproduced, are shown in table 1. In this table, th
 
 # Reproduction
 ---
-The authors of the paper have published the code used for the first draft of their paper. This publicaly available repository will be used as a starting point for the reproducability project.
+The authors of the paper have published the code used for the first draft of their paper. This publicly available repository will be used as a starting point for the reproducability project.
 
 
 ## Understanding the code
@@ -96,14 +96,9 @@ There are 4 main files
 
 *Figure 4: Code Dependencies*
 
-Lets start at the end and then walk our way backwards. The networks are ran from their respective `run_XXX.sh` run files. Here the following is specified:
+Lets start at the end and then walk our way backwards. The dependencies of the python files are as shown in figure 4. 
 
-- learning rate lr
-- test frequency: test_every
-- batch_size
-- index of which domain should be kept 'unseen': unseen_index
-- number of training loops: inner_loops
-- step size: step_size
+The networks are ran from their respective `run_XXX.sh` run files. Here the hyper parameters  are specified.
 
 
 For MLDG only:
@@ -125,20 +120,24 @@ The models are defined in main_XXX.py by initialising their respective classes w
 
 
 Both classes are defined in `model.py`.
-The MLDG model defines a new train method and inherits all other methods and properties from the baseline model.
+The MLDG model defines a new train method and inherits all other methods and properties from the baseline (MLP) model.
 
-We will now discuss the interesting parts of the MLDG train method.
+We will now discuss the interesting parts of the MLDG train method. We first start by calculating the meta-training loss.
 ```
 images_train, labels_train = self.batImageGenTrains[index].get_images_labels_batch()
 
 inputs_train, labels_train = torch.from_numpy(
     np.array(images_train, dtype=np.float32)), torch.from_numpy(
     np.array(labels_train, dtype=np.float32))
-
+    
 # wrap the inputs and labels in Variable
 inputs_train, labels_train = Variable(inputs_train, requires_grad=False).cuda(), \
     Variable(labels_train, requires_grad=False).long().cuda()
 
+```
+As can be seen in the code above, the numpy data structures are converted to Torch compatible data structures and subsequently converted to CUDA variables. 
+
+```
 # forward with the adapted parameters
 outputs_train, _ = self.network(x=inputs_train)
 
@@ -146,11 +145,9 @@ outputs_train, _ = self.network(x=inputs_train)
 loss = self.loss_fn(outputs_train, labels_train)
 meta_train_loss += loss
 ```
+Then a regular forward pass is executed and the loss is calculated. 
 
-The numpy data structures are converted to Torch compatible data structures and subsequently converted to CUDA variables. Then a regular forward pass is executed and the loss is calculated. 
->The sum of these losses on all meta training domains is the _Meta-Loss_
-
-
+Next, the meta-validation loss is calculated. This can be seen in the code below.
 
 ```
 image_val, labels_val = batImageMetaVal.get_images_labels_batch()
@@ -170,7 +167,7 @@ outputs_val, _ = self.network(x=inputs_val,
 
 meta_val_loss = self.loss_fn(outputs_val, labels_val)
 ```
-Now we essentially do the same as above but this time the proposed adapted parameters are tested on the meta-test domains. This is the key strategy of this method. The proposed parameters are only desirable if they lead to both increased performance on the meta-train domain as wel as on the meta-test domain. AKA we are looking for adaptations which lead to increased performance across a whole range of very different domains (for example PACS, as shown before). 
+Now we essentially do the same as above but this time the proposed adapted parameters are tested on the meta-test domains. This is the key strategy of this method. The proposed parameters are only desirable if they lead to both increased performance on the meta-train domain as well as on the meta-test domain. More specifically we are looking for adaptations which lead to increased performance across a whole range of very different domains (for example PACS, as shown before). 
 
 Here the hyper parameter of meta-stepsize has also come into play.
 The meta-stepsize governs the step size during the meta-training whereas the regular step size governs actual train step.
@@ -255,14 +252,14 @@ Apart from reproducing the results in table 1, the meta train loss and meta vali
 
 ![](https://i.imgur.com/Xa9S5Wx.png)
 
-*Figure 5: Photo Domain*
+*Figure 5: Meta Losses Training on Photo Domain*
 
 From figure 5, it seems as if the plot might have benefitted from a more decaying step size to prevent large fluctuations. Similarly, we could speculate that the validation set used here is unrepresentative [Machine learning mastery, Apr 2020]. This makes sense, as it is not composed of all domains. In this case it indicates that the validation dataset may be easier for the model to predict than the training dataset. This can be seen from the lower average losses for the validation set compared to the training set. The domain in the validation set is therefore better predictable than the ones in the training set. This is of course logical due to the model not performing completely equally for all domains, which can be seen in previous tables. Also, the model doesn't seem to be overfit and no early-stop has to be performed. The difference between the two lines denotes the generalization error.
 
 
 ![](https://i.imgur.com/Wlvdgdr.png)
 
-*Figure 6: Sketch Domain*
+*Figure 6: Meta Losses Training on Sketch Domain*
 
 From figure 6 can be seen that after iteration 120 little improvement is made. To compare, in Figure: Photo Domain it seems as if after iteration 250 the model doesn't learn a lot. Also, the generalization is very small in the sketch domain plot. It seems like a good fit model. However as could be seen from table 3, the accuracy on this domain is rather low. The validation losses are small, indicating that model is complex enough for the validation set. The training losses are also small and stable, indicating low variance. It might be a possibility that the model is overfitted on the training domains (meta-training set + meta-test/ validation set), but that this does not generalize well to the sketch domain.
 
