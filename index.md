@@ -8,7 +8,6 @@ Mats [[Github](https://github.com/1997rijkeboer)]
 
 # Introduction
 ---
-This blogpost is part of the TU Delft Deep Learning Course. This blogpost will detail our process of reproducing the experiments and results from the paper "Learning to Generalize: Meta-Learning for Domain Generalization", [https://arxiv.org/abs/1710.03463](https://arxiv.org/abs/1710.03463), while observing and improving upon their available code.
 
 Humans are adept at solving tasks under many different conditions. This is partly due to fast adaptation, but also due to a lifetime of encountering new task conditions. This provides the opportunity to develop strategies, which are robust to different task contexts. 
 
